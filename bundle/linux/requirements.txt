@@ -1,0 +1,6 @@
+PyInstaller
+pyinstaller-hooks-contrib
+pyqt5
+#fbs
+#lxml
+#black

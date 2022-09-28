@@ -1,4 +1,4 @@
-This code is derived from LabelImg.
+This code is derived from [LabelImg](https://github.com/heartexlabs/labelImg).
 
 # LabelImageLab
 
