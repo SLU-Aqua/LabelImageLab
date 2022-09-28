@@ -1644,7 +1644,6 @@ class MainWindow(QMainWindow, WindowMixin):
             """Annotation file priority:
             PascalXML > YOLO
             """
-
             if os.path.isfile(xml_path):
                 if self.label_file_format == LabelFileFormat.BSP:
                     self.load_bsp_xml_by_filename(xml_path)
@@ -1837,8 +1836,9 @@ class MainWindow(QMainWindow, WindowMixin):
         else:
             target_dir_path = default_open_dir_path
         self.last_open_dir = target_dir_path
-        self.import_dir_images(target_dir_path)
         self.default_save_dir = target_dir_path
+        self.import_dir_images(target_dir_path)
+
         # TODO: This call to show_bounding_box_from_annotation_file is reduntant, dublicates lable in list. bug?!
         # if self.file_path:
         #    print("koko")
