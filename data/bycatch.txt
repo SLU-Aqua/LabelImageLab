@@ -1,0 +1,12 @@
+fish
+shark
+ray
+seal
+porpoise
+crustacean
+buoy
+bird
+banana_pinger
+fo_pinger
+unknown
+litter

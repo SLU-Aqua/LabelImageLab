@@ -1,0 +1,3 @@
+metal_ring
+large_metal_ring
+plastic_ring
