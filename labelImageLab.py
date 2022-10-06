@@ -44,6 +44,9 @@ from libs.bsp_io import XML_EXT
 
 from libs.hashableQListWidgetItem import HashableQListWidgetItem
 
+# ddt
+from pathlib import Path
+
 __appname__ = "LabelImageLab"
 
 
@@ -153,8 +156,10 @@ class MainWindow(QMainWindow, WindowMixin):
         list_layout.addWidget(use_default_label_container)
 
         # Create and add combobox for showing unique labels in group
-        self.combo_box = ComboBox(self)
+        # self.combo_box = ComboBox(self)
+        self.combo_box = ComboBox()
         list_layout.addWidget(self.combo_box)
+        self.combo_box.cb.currentIndexChanged.connect(self.combo_selection_changed)
 
         # Create and add a widget for showing current label items
         self.label_list = QListWidget()
@@ -171,10 +176,19 @@ class MainWindow(QMainWindow, WindowMixin):
         self.dock.setObjectName(self.string_bundle.get_str("labels"))
         self.dock.setWidget(label_list_container)
 
+        # Create and add a widget for showing list of files
         self.file_list_widget = QListWidget()
         self.file_list_widget.itemDoubleClicked.connect(self.file_item_double_clicked)
+
+        # Create and add combobox for showing ...
+        items_combo_box_2 = ["all", "verified", "not verified"]
+        # self.combo_box_2 = ComboBox(self, items_combo_box_2)
+        self.combo_box_2 = ComboBox(items_combo_box_2)
+        self.combo_box_2.cb.currentIndexChanged.connect(self.combo_2_selection_changed)
+
         file_list_layout = QVBoxLayout()
         file_list_layout.setContentsMargins(0, 0, 0, 0)
+        file_list_layout.addWidget(self.combo_box_2)
         file_list_layout.addWidget(self.file_list_widget)
         file_list_container = QWidget()
         file_list_container.setLayout(file_list_layout)
@@ -996,6 +1010,7 @@ class MainWindow(QMainWindow, WindowMixin):
         self.canvas.reset_state()
         self.label_coordinates.clear()
         self.combo_box.cb.clear()
+        # self.combo_box_2.cb.clear()
 
     def current_item(self):
         items = self.label_list.selectedItems()
@@ -1228,86 +1243,12 @@ class MainWindow(QMainWindow, WindowMixin):
 
         unique_text_list = list(set(items_text_list))
         # Add a null row for showing all the labels
-        unique_text_list.append("")
+        unique_text_list.append("all")
         unique_text_list.sort()
 
         self.combo_box.update_items(unique_text_list)
 
-    # def save_labels(self, annotation_file_path):
-    #     # annotation_file_path = ustr(annotation_file_path)
-    #     if self.label_file is None:
-    #         self.label_file = LabelFile()
-    #         self.label_file.verified = self.canvas.verified
-
-    #     def format_shape(s):
-    #         return dict(
-    #             label=s.label,
-    #             line_color=s.line_color.getRgb(),
-    #             fill_color=s.fill_color.getRgb(),
-    #             points=[(p.x(), p.y()) for p in s.points],
-    #             # add chris
-    #             # difficult=s.difficult,
-    #         )
-
-    #     shapes = [format_shape(shape) for shape in self.canvas.shapes]
-    #     # Can add different annotation formats here
-    #     try:
-    #         if self.label_file_format == LabelFileFormat.PASCAL_VOC:
-    #             if annotation_file_path[-4:].lower() != ".xml":
-    #                 annotation_file_path += XML_EXT
-    #             self.label_file.save_pascal_voc_format(
-    #                 annotation_file_path,
-    #                 shapes,
-    #                 self.file_path,
-    #                 self.image_data,
-    #                 self.line_color.getRgb(),
-    #                 self.fill_color.getRgb(),
-    #             )
-    #         elif self.label_file_format == LabelFileFormat.YOLO:
-    #             if annotation_file_path[-4:].lower() != ".txt":
-    #                 annotation_file_path += TXT_EXT
-    #             self.label_file.save_yolo_format(
-    #                 annotation_file_path,
-    #                 shapes,
-    #                 self.file_path,
-    #                 self.image_data,
-    #                 self.label_hist,
-    #                 self.line_color.getRgb(),
-    #                 self.fill_color.getRgb(),
-    #             )
-    #         elif self.label_file_format == LabelFileFormat.CREATE_ML:
-    #             if annotation_file_path[-5:].lower() != ".json":
-    #                 annotation_file_path += JSON_EXT
-    #             self.label_file.save_create_ml_format(
-    #                 annotation_file_path,
-    #                 shapes,
-    #                 self.file_path,
-    #                 self.image_data,
-    #                 self.label_hist,
-    #                 self.line_color.getRgb(),
-    #                 self.fill_color.getRgb(),
-    #             )
-    #         else:
-    #             self.label_file.save(
-    #                 annotation_file_path,
-    #                 shapes,
-    #                 self.file_path,
-    #                 self.image_data,
-    #                 self.line_color.getRgb(),
-    #                 self.fill_color.getRgb(),
-    #             )
-    #         print(
-    #             "Image:{0} -> Annotation:{1}".format(
-    #                 self.file_path, annotation_file_path
-    #             )
-    #         )
-    #         return True
-    #     except LabelFileError as e:
-    #         self.error_message("Error saving label data", "<b>%s</b>" % e)
-    #         return False
     def save_labels(self, annotation_file_path):
-        # annotation_file_path = ustr(annotation_file_path)
-        annotation_file_path = annotation_file_path
         if self.label_file is None:
             self.label_file = LabelFile()
             self.label_file.verified = self.canvas.verified
@@ -1338,7 +1279,8 @@ class MainWindow(QMainWindow, WindowMixin):
                     self.fill_color.getRgb(),
                 )
 
-            else:
+            else:  # redundant?
+                assert 0
                 self.label_file.save(
                     annotation_file_path,
                     shapes,
@@ -1366,12 +1308,15 @@ class MainWindow(QMainWindow, WindowMixin):
     def combo_selection_changed(self, index):
         text = self.combo_box.cb.itemText(index)
         for i in range(self.label_list.count()):
-            if text == "":
+            if text == "all":
                 self.label_list.item(i).setCheckState(2)
             elif text != self.label_list.item(i).text():
                 self.label_list.item(i).setCheckState(0)
             else:
                 self.label_list.item(i).setCheckState(2)
+
+    def combo_2_selection_changed(self, index):
+        self.import_dir_images(self.last_open_dir, index)
 
     def default_label_combo_selection_changed(self, index):
         self.default_label = self.label_hist[index]
@@ -1743,7 +1688,7 @@ class MainWindow(QMainWindow, WindowMixin):
         if self.may_continue():
             self.load_file(filename)
 
-    def scan_all_images(self, folder_path):
+    def scan_all_images(self, folder_path, select: int = 0):
         extensions = [
             ".%s" % fmt.data().decode("ascii").lower()
             for fmt in QImageReader.supportedImageFormats()
@@ -1755,7 +1700,23 @@ class MainWindow(QMainWindow, WindowMixin):
                 if file.lower().endswith(tuple(extensions)):
                     relative_path = os.path.join(root, file)
                     path = os.path.abspath(relative_path)
-                    images.append(path)
+                    # ddt
+                    if select > 0:
+                        image_path = Path(path)
+                        annotaion_path = image_path.parent.joinpath(
+                            image_path.stem + ".xml"
+                        )
+                        t_bsp_parse_reader = BspReader(annotaion_path)
+                        # print(t_bsp_parse_reader.verified, annotaion_path.exists())
+                        if select == 1 and t_bsp_parse_reader.verified:
+                            images.append(path)
+                        elif select == 2 and not t_bsp_parse_reader.verified:
+                            images.append(path)
+                    else:
+                        images.append(path)
+                    # ddt-end
+
+                    # images.append(path)
         natural_sort(images, key=lambda x: x.lower())
         return images
 
@@ -1835,6 +1796,7 @@ class MainWindow(QMainWindow, WindowMixin):
 
         else:
             target_dir_path = default_open_dir_path
+
         self.last_open_dir = target_dir_path
         self.default_save_dir = target_dir_path
         self.import_dir_images(target_dir_path)
@@ -1844,7 +1806,7 @@ class MainWindow(QMainWindow, WindowMixin):
         #    print("koko")
         #   self.show_bounding_box_from_annotation_file(file_path=self.file_path)
 
-    def import_dir_images(self, dir_path):
+    def import_dir_images(self, dir_path, select: int = 0):
         if not self.may_continue() or not dir_path:
             return
 
@@ -1852,10 +1814,19 @@ class MainWindow(QMainWindow, WindowMixin):
         self.dir_name = dir_path
         self.file_path = None
         self.file_list_widget.clear()
-        self.m_img_list = self.scan_all_images(dir_path)
+        self.m_img_list = self.scan_all_images(dir_path, select)
         self.img_count = len(self.m_img_list)
         for imgPath in self.m_img_list:
             item = QListWidgetItem(imgPath)
+
+            # # ddt
+            # image_path = Path(item.text())
+            # annotaion_path = image_path.parent.joinpath(image_path.stem + ".xml")
+            # t_bsp_parse_reader = BspReader(annotaion_path)
+            # print(t_bsp_parse_reader.verified, annotaion_path.exists())
+            # if not t_bsp_parse_reader.verified:
+            #     self.file_list_widget.addItem(item)
+            # # ddt-end
             self.file_list_widget.addItem(item)
         # print("len(self.label_list)", len(self.label_list))
         # self.label_list.clear()
