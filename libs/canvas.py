@@ -568,8 +568,8 @@ class Canvas(QWidget):
             rect_width = right_bottom.x() - left_top.x()
             rect_height = right_bottom.y() - left_top.y()
             p.setPen(self.drawing_rect_color)
-            brush = QBrush(Qt.BDiagPattern)
-            p.setBrush(brush)
+            # brush = QBrush(Qt.BDiagPattern)
+            # p.setBrush(brush)
             p.drawRect(
                 int(left_top.x()), int(left_top.y()), int(rect_width), int(rect_height)
             )

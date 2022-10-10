@@ -1,7 +1,8 @@
 import xml.etree.ElementTree as ET
 from xml.dom import minidom
 import os
-
+from pathlib import Path
+import sys
 
 XML_EXT = ".xml"
 
@@ -55,13 +56,13 @@ class BspWriter:
         filename.text = self.filename
         root.append(filename)
 
-        # source
-        source = ET.Element("source")
-        root.append(source)
-        filename = ET.SubElement(source, "filename")
-        filename.text = "TBD"  # source_path.name
-        path = ET.SubElement(source, "path")
-        path.text = "TBD"  # str(source_path.parent)
+        ## source
+        # source = ET.Element("source")
+        # root.append(source)
+        # filename = ET.SubElement(source, "filename")
+        # filename.text = "TBD"  # source_path.name
+        # path = ET.SubElement(source, "path")
+        # path.text = "TBD"  # str(source_path.parent)
 
         # size
         size = ET.Element("size")
@@ -76,18 +77,8 @@ class BspWriter:
         else:
             depth.text = "1"
 
-        return root
-
-    # def add_bnd_box(self, x_min, y_min, x_max, y_max, name, difficult):
-    def add_bnd_box(self, x_min, y_min, x_max, y_max, name):
-        bnd_box = {"xmin": x_min, "ymin": y_min, "xmax": x_max, "ymax": y_max}
-        bnd_box["name"] = name
-        # bnd_box["difficult"] = difficult
-        self.box_list.append(bnd_box)
-
-    def append_objects(self, top):
         for i, each_object in enumerate(self.box_list):
-            object_item = ET.SubElement(top, "object")
+            object_item = ET.SubElement(root, "object")
             object_item.set("id", str(i))
             name = ET.SubElement(object_item, "name")
             name.text = each_object["name"]
@@ -102,10 +93,60 @@ class BspWriter:
             y_max = ET.SubElement(bnd_box, "ymax")
             y_max.text = str(each_object["ymax"])
 
-    def save(self, target_file=None):
-        root = self.gen_xml()
-        self.append_objects(root)
+        return root
 
+    # def add_bnd_box(self, x_min, y_min, x_max, y_max, name, difficult):
+    def add_bnd_box(self, x_min, y_min, x_max, y_max, name):
+        bnd_box = {"xmin": x_min, "ymin": y_min, "xmax": x_max, "ymax": y_max}
+        bnd_box["name"] = name
+        # bnd_box["difficult"] = difficult
+        self.box_list.append(bnd_box)
+
+    def set_objects(self, target_file_path: Path):
+
+        try:
+            xml_tree = ET.parse(target_file_path).getroot()
+
+            if self.verified:
+                xml_tree.set("verified", "yes")
+            elif "verified" in xml_tree.attrib.keys():
+                xml_tree.attrib.pop("verified")
+
+            # Remove object.
+            for i, object in enumerate(xml_tree.findall("./object")):
+                xml_tree.remove(object)
+
+            # Set object.
+            for i, each_object in enumerate(self.box_list):
+                object_item = ET.SubElement(xml_tree, "object")
+                object_item.set("id", str(i))
+                name = ET.SubElement(object_item, "name")
+                name.text = each_object["name"]
+
+                bnd_box = ET.SubElement(object_item, "bndbox")
+                x_min = ET.SubElement(bnd_box, "xmin")
+                x_min.text = str(each_object["xmin"])
+                y_min = ET.SubElement(bnd_box, "ymin")
+                y_min.text = str(each_object["ymin"])
+                x_max = ET.SubElement(bnd_box, "xmax")
+                x_max.text = str(each_object["xmax"])
+                y_max = ET.SubElement(bnd_box, "ymax")
+                y_max.text = str(each_object["ymax"])
+
+        except ET.ParseError as e:
+            sys.exit(f"ET.ParseError: {e}")
+        except AttributeError as e:
+            sys.exit(f"ET.AttributeError: {e}")
+
+        return xml_tree
+
+    def save(self, target_file=None):
+
+        target_file_path = Path(target_file)
+        if target_file_path.exists():
+            root = self.set_objects(target_file_path)
+        else:
+            root = self.gen_xml()
         xmlstr = self.prettify(root)
 
         if target_file is None:
@@ -119,8 +160,6 @@ class BspWriter:
 
 class BspReader:
     def __init__(self, file_path):
-        # shapes type:
-        # [labbel, [(x1,y1), (x2,y2), (x3,y3), (x4,y4)], color, color, difficult]
         self.shapes = []
         self.file_path = file_path
         self.verified = False
@@ -132,14 +171,12 @@ class BspReader:
     def get_shapes(self):
         return self.shapes
 
-    # def add_shape(self, label, bnd_box, difficult):
     def add_shape(self, label, bnd_box):
         x_min = int(float(bnd_box.find("xmin").text))
         y_min = int(float(bnd_box.find("ymin").text))
         x_max = int(float(bnd_box.find("xmax").text))
         y_max = int(float(bnd_box.find("ymax").text))
         points = [(x_min, y_min), (x_max, y_min), (x_max, y_max), (x_min, y_max)]
-        # self.shapes.append((label, points, None, None, difficult))
         self.shapes.append((label, points, None, None))
 
     def parse_xml(self):
@@ -156,10 +193,5 @@ class BspReader:
         for object_iter in xml_tree.findall("object"):
             bnd_box = object_iter.find("bndbox")
             label = object_iter.find("name").text
-            # Add chris
-            # difficult = False
-            # if object_iter.find("difficult") is not None:
-            #    difficult = bool(int(object_iter.find("difficult").text))
-            # self.add_shape(label, bnd_box, difficult)
             self.add_shape(label, bnd_box)
         return True

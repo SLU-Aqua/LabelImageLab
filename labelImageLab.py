@@ -892,16 +892,18 @@ class MainWindow(QMainWindow, WindowMixin):
         if self.file_path and os.path.isdir(self.file_path):
             self.open_dir_dialog(dir_path=self.file_path, silent=True)
 
-    def keyReleaseEvent(self, event):
-        # print("keyReleaseEvent: event.key()", event.key())
-        if event.key() == Qt.Key_Control:
-            self.canvas.set_drawing_shape_to_square(False)
+    # def keyReleaseEvent(self, event):
+    #     # print("keyReleaseEvent: event.key()", event.key())
+    #     if event.key() == Qt.Key_Control:
+    #         print("keyReleaseEvent")
+    #         self.canvas.set_drawing_shape_to_square(False)
 
-    def keyPressEvent(self, event):
-        # print("keyPressEvent: event.key()", event.key())
-        if event.key() == Qt.Key_Control:
-            # Draw rectangle if Ctrl is pressed
-            self.canvas.set_drawing_shape_to_square(True)
+    # def keyPressEvent(self, event):
+    #     # print("keyPressEvent: event.key()", event.key())
+    #     if event.key() == Qt.Key_Control:
+    #         print("keyPressEvent")
+    #         # Draw rectangle if Ctrl is pressed
+    #         self.canvas.set_drawing_shape_to_square(True)
 
     # # Support Functions #
     # def set_format(self, save_format):
@@ -2155,6 +2157,7 @@ class MainWindow(QMainWindow, WindowMixin):
             shape.paint_label = self.display_label_option.isChecked()
 
     def toggle_draw_square(self):
+        print("toggle_draw_square")
         self.canvas.set_drawing_shape_to_square(self.draw_squares_option.isChecked())
 
 
