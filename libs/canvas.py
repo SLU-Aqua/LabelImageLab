@@ -57,7 +57,7 @@ class Canvas(QWidget):
         self.setMouseTracking(True)
         self.setFocusPolicy(Qt.WheelFocus)
         self.verified = False
-        self.draw_square = False
+        # self.draw_square = False
 
         # initialisation for panning
         self.pan_initial_pos = QPoint()
@@ -149,18 +149,19 @@ class Canvas(QWidget):
                     self.override_cursor(CURSOR_POINT)
                     self.current.highlight_vertex(0, Shape.NEAR_VERTEX)
 
-                if self.draw_square:
-                    init_pos = self.current[0]
-                    min_x = init_pos.x()
-                    min_y = init_pos.y()
-                    min_size = min(abs(pos.x() - min_x), abs(pos.y() - min_y))
-                    direction_x = -1 if pos.x() - min_x < 0 else 1
-                    direction_y = -1 if pos.y() - min_y < 0 else 1
-                    self.line[1] = QPointF(
-                        min_x + direction_x * min_size, min_y + direction_y * min_size
-                    )
-                else:
-                    self.line[1] = pos
+                # if self.draw_square:
+                #     init_pos = self.current[0]
+                #     min_x = init_pos.x()
+                #     min_y = init_pos.y()
+                #     min_size = min(abs(pos.x() - min_x), abs(pos.y() - min_y))
+                #     direction_x = -1 if pos.x() - min_x < 0 else 1
+                #     direction_y = -1 if pos.y() - min_y < 0 else 1
+                #     self.line[1] = QPointF(
+                #         min_x + direction_x * min_size, min_y + direction_y * min_size
+                #     )
+                # else:
+                #    self.line[1] = pos
+                self.line[1] = pos
 
                 self.line.line_color = color
                 self.prev_point = QPointF()
@@ -432,21 +433,22 @@ class Canvas(QWidget):
             clipped_y = min(max(0, pos.y()), size.height())
             pos = QPointF(clipped_x, clipped_y)
 
-        if self.draw_square:
-            opposite_point_index = (index + 2) % 4
-            opposite_point = shape[opposite_point_index]
+        # if self.draw_square:
+        #     opposite_point_index = (index + 2) % 4
+        #     opposite_point = shape[opposite_point_index]
 
-            min_size = min(
-                abs(pos.x() - opposite_point.x()), abs(pos.y() - opposite_point.y())
-            )
-            direction_x = -1 if pos.x() - opposite_point.x() < 0 else 1
-            direction_y = -1 if pos.y() - opposite_point.y() < 0 else 1
-            shift_pos = QPointF(
-                opposite_point.x() + direction_x * min_size - point.x(),
-                opposite_point.y() + direction_y * min_size - point.y(),
-            )
-        else:
-            shift_pos = pos - point
+        #     min_size = min(
+        #         abs(pos.x() - opposite_point.x()), abs(pos.y() - opposite_point.y())
+        #     )
+        #     direction_x = -1 if pos.x() - opposite_point.x() < 0 else 1
+        #     direction_y = -1 if pos.y() - opposite_point.y() < 0 else 1
+        #     shift_pos = QPointF(
+        #         opposite_point.x() + direction_x * min_size - point.x(),
+        #         opposite_point.y() + direction_y * min_size - point.y(),
+        #     )
+        # else:
+        #     shift_pos = pos - point
+        shift_pos = pos - point
 
         shape.move_vertex_by(index, shift_pos)
 
@@ -795,5 +797,5 @@ class Canvas(QWidget):
         self.pixmap = None
         self.update()
 
-    def set_drawing_shape_to_square(self, status):
-        self.draw_square = status
+    # def set_drawing_shape_to_square(self, status):
+    #     self.draw_square = status

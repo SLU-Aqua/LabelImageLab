@@ -203,9 +203,9 @@ class MainWindow(QMainWindow, WindowMixin):
         self.canvas = Canvas(parent=self)
         self.canvas.zoomRequest.connect(self.zoom_request)
         self.canvas.lightRequest.connect(self.light_request)
-        self.canvas.set_drawing_shape_to_square(
-            settings.get(SETTING_DRAW_SQUARE, False)
-        )
+        # self.canvas.set_drawing_shape_to_square(
+        #    settings.get(SETTING_DRAW_SQUARE, False)
+        # )
 
         scroll = QScrollArea()
         scroll.setWidget(self.canvas)
@@ -607,14 +607,14 @@ class MainWindow(QMainWindow, WindowMixin):
         self.label_list.setContextMenuPolicy(Qt.CustomContextMenu)
         self.label_list.customContextMenuRequested.connect(self.pop_label_list_menu)
 
-        # Draw squares/rectangles
-        self.draw_squares_option = QAction(
-            self.string_bundle.get_str("drawSquares"), self
-        )
-        self.draw_squares_option.setShortcut("Ctrl+Shift+R")
-        self.draw_squares_option.setCheckable(True)
-        self.draw_squares_option.setChecked(settings.get(SETTING_DRAW_SQUARE, False))
-        self.draw_squares_option.triggered.connect(self.toggle_draw_square)
+        # # Draw squares/rectangles
+        # self.draw_squares_option = QAction(
+        #     self.string_bundle.get_str("drawSquares"), self
+        # )
+        # self.draw_squares_option.setShortcut("Ctrl+Shift+R")
+        # self.draw_squares_option.setCheckable(True)
+        # self.draw_squares_option.setChecked(settings.get(SETTING_DRAW_SQUARE, False))
+        # self.draw_squares_option.triggered.connect(self.toggle_draw_square)
 
         # Store actions for further handling.
         self.actions = Struct(
@@ -650,7 +650,8 @@ class MainWindow(QMainWindow, WindowMixin):
             beginner=(),
             advanced=(),
             # editMenu=(edit, copy, delete, None, color1, self.draw_squares_option),
-            editMenu=(edit, delete, None, color1, self.draw_squares_option),
+            # editMenu=(edit, delete, None, color1, self.draw_squares_option),
+            editMenu=(edit, delete, None, color1),
             # beginnerContext=(create, edit, copy, delete),
             beginnerContext=(create, edit, delete),
             advancedContext=(
@@ -1682,7 +1683,7 @@ class MainWindow(QMainWindow, WindowMixin):
         settings[SETTING_AUTO_SAVE] = self.auto_saving.isChecked()
         settings[SETTING_SINGLE_CLASS] = self.single_class_mode.isChecked()
         settings[SETTING_PAINT_LABEL] = self.display_label_option.isChecked()
-        settings[SETTING_DRAW_SQUARE] = self.draw_squares_option.isChecked()
+        # settings[SETTING_DRAW_SQUARE] = self.draw_squares_option.isChecked()
         settings[SETTING_LABEL_FILE_FORMAT] = self.label_file_format
         settings.save()
 
@@ -2156,9 +2157,9 @@ class MainWindow(QMainWindow, WindowMixin):
         for shape in self.canvas.shapes:
             shape.paint_label = self.display_label_option.isChecked()
 
-    def toggle_draw_square(self):
-        print("toggle_draw_square")
-        self.canvas.set_drawing_shape_to_square(self.draw_squares_option.isChecked())
+    # def toggle_draw_square(self):
+    #     print("toggle_draw_square")
+    #     self.canvas.set_drawing_shape_to_square(self.draw_squares_option.isChecked())
 
 
 def inverted(color):

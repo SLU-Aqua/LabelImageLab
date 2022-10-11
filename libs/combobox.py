@@ -1,4 +1,3 @@
-from curses import tigetflag
 import sys
 
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QComboBox
