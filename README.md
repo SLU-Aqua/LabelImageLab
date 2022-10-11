@@ -10,7 +10,7 @@ This code have been tested on: Ubuntu 22.04
 
 Clone this repo
 ````bash
-git clone git@github.com:BalticSeabird/DataLabelAndEdit.git
+git clone git@github.com:SLU-Aqua/LabelImageLab.git
 cd LabelImageLab
 ````
 
@@ -27,7 +27,12 @@ venv/bin/pyrcc5 -o libs/resources.py resources.qrc
 ## Usage
 For example 
 ````bash
-venv/bin/python3 labelImg.py /home/erik/tmp/data/ data/bsp_ring_classes.txt
+venv/bin/python3 labelImageLab.py -d /home/erik/tmp/rings3 -c data/bsp_ring_classes.txt
 ````
+For help and more options
+````bash
+venv/bin/python3 labelImageLab.py -h
+````
+
 
 ## Build app
