@@ -57,6 +57,7 @@ class Canvas(QWidget):
         self.setMouseTracking(True)
         self.setFocusPolicy(Qt.WheelFocus)
         self.verified = False
+        self.warning = False
         # self.draw_square = False
 
         # initialisation for panning
@@ -596,9 +597,13 @@ class Canvas(QWidget):
             )
 
         self.setAutoFillBackground(True)
-        if self.verified:
+        if self.verified and not self.warning:
             pal = self.palette()
             pal.setColor(self.backgroundRole(), QColor(184, 239, 38, 128))
+            self.setPalette(pal)
+        elif self.warning:
+            pal = self.palette()
+            pal.setColor(self.backgroundRole(), QColor(250, 50, 50, 128))
             self.setPalette(pal)
         else:
             pal = self.palette()

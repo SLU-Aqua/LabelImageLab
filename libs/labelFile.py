@@ -28,6 +28,7 @@ class LabelFile(object):
         self.image_path = None
         self.image_data = None
         self.verified = False
+        self.warning = False
 
     # def save_create_ml_format(
     #     self,
@@ -123,6 +124,7 @@ class LabelFile(object):
             img_folder_name, img_file_name, image_shape, local_img_path=image_path
         )
         writer.verified = self.verified
+        writer.warning = self.warning
 
         for shape in shapes:
             points = shape["points"]
@@ -187,6 +189,9 @@ class LabelFile(object):
 
     def toggle_verify(self):
         self.verified = not self.verified
+
+    def toggle_warning(self):
+        self.warning = not self.warning
 
     """ ttf is disable
     def load(self, filename):

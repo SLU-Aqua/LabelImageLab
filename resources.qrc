@@ -35,5 +35,6 @@
 <file alias="prev">resources/icons/prev.png</file>
 <file alias="resetall">resources/icons/resetall.png</file>
 <file alias="verify">resources/icons/verify.png</file>
+<file alias="warning">resources/icons/warning.png</file>
 </qresource>
 </RCC>

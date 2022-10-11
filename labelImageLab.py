@@ -9,11 +9,9 @@ import sys
 # import webbrowser as wb
 from functools import partial
 
-
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
-
 
 from libs.combobox import ComboBox
 from libs.default_label_combobox import DefaultLabelComboBox
@@ -303,6 +301,14 @@ class MainWindow(QMainWindow, WindowMixin):
             "space",
             "verify",
             self.string_bundle.get_str("verifyImgDetail"),
+        )
+
+        warning = action(
+            self.string_bundle.get_str("warningImg"),
+            self.waning_image,
+            "b",
+            "warning",
+            self.string_bundle.get_str("waningImgDetail"),
         )
 
         save = action(
@@ -765,6 +771,7 @@ class MainWindow(QMainWindow, WindowMixin):
             open_next_image,
             open_prev_image,
             verify,
+            warning,
             save,
             # save_format,
             None,
@@ -1261,6 +1268,7 @@ class MainWindow(QMainWindow, WindowMixin):
         if self.label_file is None:
             self.label_file = LabelFile()
             self.label_file.verified = self.canvas.verified
+            self.label_file.warning = self.canvas.warning
 
         def format_shape(s):
             return dict(
@@ -1540,6 +1548,7 @@ class MainWindow(QMainWindow, WindowMixin):
 
                 self.fill_color = QColor(*self.label_file.fillColor)
                 self.canvas.verified = self.label_file.verified
+                self.canvas.warning = self.label_file.warning
             else:
                 # print("koko")
                 # Load image:
@@ -1547,6 +1556,7 @@ class MainWindow(QMainWindow, WindowMixin):
                 self.image_data = read(unicode_file_path, None)
                 self.label_file = None
                 self.canvas.verified = False
+                self.canvas.warning = False
 
             if isinstance(self.image_data, QImage):
                 image = self.image_data
@@ -1863,6 +1873,24 @@ class MainWindow(QMainWindow, WindowMixin):
             self.paint_canvas()
             self.save_file()
 
+    def waning_image(self, _value=False):
+        # Proceeding next image without dialog if having any label
+        if self.file_path is not None:
+            try:
+                self.label_file.toggle_warning()
+            except AttributeError:
+                # If the labelling file does not exist yet, create if and
+                # re-save it with the warning attribute.
+                self.save_file()
+                if self.label_file is not None:
+                    self.label_file.toggle_warning()
+                else:
+                    return
+
+            self.canvas.warning = self.label_file.warning
+            self.paint_canvas()
+            self.save_file()
+
     def open_prev_image(self, _value=False):
         # Proceeding prev image without dialog if having any label
         if self.auto_saving.isChecked():
@@ -2129,6 +2157,7 @@ class MainWindow(QMainWindow, WindowMixin):
         # print("load_bsp_xml_by_filename")
         self.load_labels(shapes)
         self.canvas.verified = t_bsp_parse_reader.verified
+        self.canvas.warning = t_bsp_parse_reader.warning
 
     # def load_yolo_txt_by_filename(self, txt_path):
     #     if self.file_path is None:

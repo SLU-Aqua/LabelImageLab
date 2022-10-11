@@ -23,6 +23,7 @@ class BspWriter:
         self.box_list = []
         self.local_img_path = local_img_path
         self.verified = False
+        self.warning = False
 
     def prettify(self, elem):
         # """
@@ -50,6 +51,8 @@ class BspWriter:
 
         if self.verified:
             root.set("verified", "yes")
+        if self.warning:
+            root.set("warning", "yes")
 
         # filename
         filename = ET.Element("filename")
@@ -112,6 +115,11 @@ class BspWriter:
             elif "verified" in xml_tree.attrib.keys():
                 xml_tree.attrib.pop("verified")
 
+            if self.warning:
+                xml_tree.set("warning", "yes")
+            elif "warning" in xml_tree.attrib.keys():
+                xml_tree.attrib.pop("warning")
+
             # Remove object.
             for i, object in enumerate(xml_tree.findall("./object")):
                 xml_tree.remove(object)
@@ -163,6 +171,7 @@ class BspReader:
         self.shapes = []
         self.file_path = file_path
         self.verified = False
+        self.warning = False
         try:
             self.parse_xml()
         except:
@@ -189,6 +198,13 @@ class BspReader:
                 self.verified = True
         except KeyError:
             self.verified = False
+
+        try:
+            warning = xml_tree.attrib["warning"]
+            if warning == "yes":
+                self.warning = True
+        except KeyError:
+            self.warning = False
 
         for object_iter in xml_tree.findall("object"):
             bnd_box = object_iter.find("bndbox")
