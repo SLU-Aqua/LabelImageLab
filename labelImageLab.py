@@ -110,7 +110,7 @@ class MainWindow(QMainWindow, WindowMixin):
         self.dirty = False
 
         self._no_selection_slot = False
-        self._beginner = True
+        # self._beginner = True
 
         # Load predefined classes to the list
         self.load_predefined_classes(default_prefdef_class_file)
@@ -242,13 +242,13 @@ class MainWindow(QMainWindow, WindowMixin):
             self.string_bundle.get_str("quitApp"),
         )
 
-        open = action(
-            self.string_bundle.get_str("openFile"),
-            self.open_file,
-            "Ctrl+O",
-            "open",
-            self.string_bundle.get_str("openFileDetail"),
-        )
+        # open = action(
+        #     self.string_bundle.get_str("openFile"),
+        #     self.open_file,
+        #     "Ctrl+O",
+        #     "open",
+        #     self.string_bundle.get_str("openFileDetail"),
+        # )
 
         open_dir = action(
             self.string_bundle.get_str("openDir"),
@@ -266,13 +266,13 @@ class MainWindow(QMainWindow, WindowMixin):
             self.string_bundle.get_str("changeSavedAnnotationDir"),
         )
 
-        open_annotation = action(
-            self.string_bundle.get_str("openAnnotation"),
-            self.open_annotation_dialog,
-            "Ctrl+Shift+O",
-            "open",
-            self.string_bundle.get_str("openAnnotationDetail"),
-        )
+        # open_annotation = action(
+        #     self.string_bundle.get_str("openAnnotation"),
+        #     self.open_annotation_dialog,
+        #     "Ctrl+Shift+O",
+        #     "open",
+        #     self.string_bundle.get_str("openAnnotationDetail"),
+        # )
         copy_prev_bounding = action(
             self.string_bundle.get_str("copyPrevBounding"),
             self.copy_previous_bounding_boxes,
@@ -334,14 +334,14 @@ class MainWindow(QMainWindow, WindowMixin):
         #     enabled=True,
         # )
 
-        save_as = action(
-            self.string_bundle.get_str("saveAs"),
-            self.save_file_as,
-            "Ctrl+Shift+S",
-            "save-as",
-            self.string_bundle.get_str("saveAsDetail"),
-            enabled=False,
-        )
+        # save_as = action(
+        #     self.string_bundle.get_str("saveAs"),
+        #     self.save_file_as,
+        #     "Ctrl+Shift+S",
+        #     "save-as",
+        #     self.string_bundle.get_str("saveAsDetail"),
+        #     enabled=False,
+        # )
 
         close = action(
             self.string_bundle.get_str("closeCur"),
@@ -417,14 +417,14 @@ class MainWindow(QMainWindow, WindowMixin):
         #     enabled=False,
         # )
 
-        advanced_mode = action(
-            self.string_bundle.get_str("advancedMode"),
-            self.toggle_advanced_mode,
-            "Ctrl+Shift+A",
-            "expert",
-            self.string_bundle.get_str("advancedModeDetail"),
-            checkable=True,
-        )
+        # advanced_mode = action(
+        #     self.string_bundle.get_str("advancedMode"),
+        #     self.toggle_advanced_mode,
+        #     "Ctrl+Shift+A",
+        #     "expert",
+        #     self.string_bundle.get_str("advancedModeDetail"),
+        #     checkable=True,
+        # )
 
         hide_all = action(
             self.string_bundle.get_str("hideAllBox"),
@@ -620,8 +620,8 @@ class MainWindow(QMainWindow, WindowMixin):
         self.actions = Struct(
             save=save,
             # save_format=save_format,
-            saveAs=save_as,
-            open=open,
+            # saveAs=save_as,
+            # open=open,
             close=close,
             resetAll=reset_all,
             deleteImg=delete_image,
@@ -632,7 +632,7 @@ class MainWindow(QMainWindow, WindowMixin):
             # copy=copy,
             createMode=create_mode,
             editMode=edit_mode,
-            advancedMode=advanced_mode,
+            # advancedMode=advanced_mode,
             shapeLineColor=shape_line_color,
             shapeFillColor=shape_fill_color,
             zoom=zoom,
@@ -646,25 +646,27 @@ class MainWindow(QMainWindow, WindowMixin):
             lightDarken=light_darken,
             lightOrg=light_org,
             lightActions=light_actions,
-            fileMenuActions=(open, open_dir, save, save_as, close, reset_all, quit),
+            # fileMenuActions=(open, open_dir, save, save_as, close, reset_all, quit),
+            fileMenuActions=(open_dir, save, close, reset_all, quit),
             beginner=(),
-            advanced=(),
+            # advanced=(),
             # editMenu=(edit, copy, delete, None, color1, self.draw_squares_option),
             # editMenu=(edit, delete, None, color1, self.draw_squares_option),
             editMenu=(edit, delete, None, color1),
             # beginnerContext=(create, edit, copy, delete),
             beginnerContext=(create, edit, delete),
-            advancedContext=(
-                create_mode,
-                edit_mode,
-                edit,
-                # copy,
-                delete,
-                shape_line_color,
-                shape_fill_color,
-            ),
+            # advancedContext=(
+            #     create_mode,
+            #     edit_mode,
+            #     edit,
+            #     # copy,
+            #     delete,
+            #     shape_line_color,
+            #     shape_fill_color,
+            # ),
             onLoadActive=(close, create, create_mode, edit_mode),
-            onShapesPresent=(save_as, hide_all, show_all),
+            # onShapesPresent=(save_as, hide_all, show_all),
+            onShapesPresent=(hide_all, show_all),
         )
 
         self.menus = Struct(
@@ -700,15 +702,15 @@ class MainWindow(QMainWindow, WindowMixin):
         add_actions(
             self.menus.file,
             (
-                open,
+                # open,
                 open_dir,
                 change_save_dir,
-                open_annotation,
+                # open_annotation,
                 copy_prev_bounding,
                 self.menus.recentFiles,
                 save,
                 # save_format,
-                save_as,
+                # save_as,
                 close,
                 reset_all,
                 delete_image,
@@ -725,7 +727,7 @@ class MainWindow(QMainWindow, WindowMixin):
                 self.single_class_mode,
                 self.display_label_option,
                 labels,
-                advanced_mode,
+                # advanced_mode,
                 None,
                 hide_all,
                 show_all,
@@ -757,9 +759,9 @@ class MainWindow(QMainWindow, WindowMixin):
 
         self.tools = self.toolbar("Tools")
         self.actions.beginner = (
-            open,
+            # open,
             open_dir,
-            change_save_dir,
+            # change_save_dir,
             open_next_image,
             open_prev_image,
             verify,
@@ -782,21 +784,21 @@ class MainWindow(QMainWindow, WindowMixin):
             light_org,
         )
 
-        self.actions.advanced = (
-            open,
-            open_dir,
-            change_save_dir,
-            open_next_image,
-            open_prev_image,
-            save,
-            # save_format,
-            None,
-            create_mode,
-            edit_mode,
-            None,
-            hide_all,
-            show_all,
-        )
+        # self.actions.advanced = (
+        #     # open,
+        #     open_dir,
+        #     # change_save_dir,
+        #     open_next_image,
+        #     open_prev_image,
+        #     save,
+        #     # save_format,
+        #     None,
+        #     create_mode,
+        #     edit_mode,
+        #     None,
+        #     hide_all,
+        #     show_all,
+        # )
 
         self.statusBar().showMessage("%s started." % __appname__)
         self.statusBar().show()
@@ -866,9 +868,9 @@ class MainWindow(QMainWindow, WindowMixin):
                 return x.toBool()
             return bool(x)
 
-        if xbool(settings.get(SETTING_ADVANCE_MODE, False)):
-            self.actions.advancedMode.setChecked(True)
-            self.toggle_advanced_mode()
+        # if xbool(settings.get(SETTING_ADVANCE_MODE, False)):
+        #     self.actions.advancedMode.setChecked(True)
+        #     self.toggle_advanced_mode()
 
         # Populate the File menu dynamically.
         self.update_file_menu()
@@ -940,42 +942,45 @@ class MainWindow(QMainWindow, WindowMixin):
     def no_shapes(self):
         return not self.items_to_shapes
 
-    def toggle_advanced_mode(self, value=True):
-        self._beginner = not value
-        self.canvas.set_editing(True)
-        self.populate_mode_actions()
-        self.edit_button.setVisible(not value)
-        if value:
-            self.actions.createMode.setEnabled(True)
-            self.actions.editMode.setEnabled(False)
-            self.dock.setFeatures(self.dock.features() | self.dock_features)
-        else:
-            self.dock.setFeatures(self.dock.features() ^ self.dock_features)
+    # def toggle_advanced_mode(self, value=True):
+    #     self._beginner = not value
+    #     self.canvas.set_editing(True)
+    #     self.populate_mode_actions()
+    #     self.edit_button.setVisible(not value)
+    #     if value:
+    #         self.actions.createMode.setEnabled(True)
+    #         self.actions.editMode.setEnabled(False)
+    #         self.dock.setFeatures(self.dock.features() | self.dock_features)
+    #     else:
+    #         self.dock.setFeatures(self.dock.features() ^ self.dock_features)
 
     def populate_mode_actions(self):
-        if self.beginner():
-            tool, menu = self.actions.beginner, self.actions.beginnerContext
-        else:
-            tool, menu = self.actions.advanced, self.actions.advancedContext
+        # if self.beginner():
+        #     tool, menu = self.actions.beginner, self.actions.beginnerContext
+        # else:
+        #     tool, menu = self.actions.advanced, self.actions.advancedContext
+        tool, menu = self.actions.beginner, self.actions.beginnerContext
+
         self.tools.clear()
         add_actions(self.tools, tool)
         self.canvas.menus[0].clear()
         add_actions(self.canvas.menus[0], menu)
         self.menus.edit.clear()
-        actions = (
-            (self.actions.create,)
-            if self.beginner()
-            else (self.actions.createMode, self.actions.editMode)
-        )
+        # actions = (
+        #     (self.actions.create,)
+        #     if self.beginner()
+        #     else (self.actions.createMode, self.actions.editMode)
+        # )
+        actions = (self.actions.create,)
         add_actions(self.menus.edit, actions + self.actions.editMenu)
 
-    def set_beginner(self):
-        self.tools.clear()
-        add_actions(self.tools, self.actions.beginner)
+    # def set_beginner(self):
+    #    self.tools.clear()
+    #    add_actions(self.tools, self.actions.beginner)
 
-    def set_advanced(self):
-        self.tools.clear()
-        add_actions(self.tools, self.actions.advanced)
+    # def set_advanced(self):
+    #     self.tools.clear()
+    #     add_actions(self.tools, self.actions.advanced)
 
     def set_dirty(self):
         self.dirty = True
@@ -1028,11 +1033,11 @@ class MainWindow(QMainWindow, WindowMixin):
             self.recent_files.pop()
         self.recent_files.insert(0, file_path)
 
-    def beginner(self):
-        return self._beginner
+    # def beginner(self):
+    #    return self._beginner
 
-    def advanced(self):
-        return not self.beginner()
+    # def advanced(self):
+    #     return not self.beginner()
 
     # def show_tutorial_dialog(self, browser="default", link=None):
     #     if link is None:
@@ -1073,14 +1078,15 @@ class MainWindow(QMainWindow, WindowMixin):
     #     )
 
     def create_shape(self):
-        assert self.beginner()
+        # assert self.beginner()
         self.canvas.set_editing(False)
         self.actions.create.setEnabled(False)
 
     def toggle_drawing_sensitive(self, drawing=True):
         """In the middle of drawing, toggling between modes should be disabled."""
         self.actions.editMode.setEnabled(not drawing)
-        if not drawing and self.beginner():
+        # if not drawing and self.beginner():
+        if not drawing:
             # Cancel creation.
             print("Cancel creation.")
             self.canvas.set_editing(True)
@@ -1093,11 +1099,11 @@ class MainWindow(QMainWindow, WindowMixin):
         self.actions.editMode.setEnabled(not edit)
 
     def set_create_mode(self):
-        assert self.advanced()
+        # assert self.advanced()
         self.toggle_draw_mode(False)
 
     def set_edit_mode(self):
-        assert self.advanced()
+        # assert self.advanced()
         self.toggle_draw_mode(True)
         self.label_selection_changed()
 
@@ -1370,11 +1376,15 @@ class MainWindow(QMainWindow, WindowMixin):
             generate_color = generate_color_by_text(text)
             shape = self.canvas.set_last_label(text, generate_color, generate_color)
             self.add_label(shape)
-            if self.beginner():  # Switch to edit mode.
-                self.canvas.set_editing(True)
-                self.actions.create.setEnabled(True)
-            else:
-                self.actions.editMode.setEnabled(True)
+            # if self.beginner():  # Switch to edit mode.
+            #     self.canvas.set_editing(True)
+            #     self.actions.create.setEnabled(True)
+            # else:
+            #     self.actions.editMode.setEnabled(True)
+            # if self.beginner():  # Switch to edit mode.
+            self.canvas.set_editing(True)
+            self.actions.create.setEnabled(True)
+
             self.set_dirty()
 
             if text not in self.label_hist:
@@ -1669,7 +1679,7 @@ class MainWindow(QMainWindow, WindowMixin):
         settings[SETTING_LINE_COLOR] = self.line_color
         settings[SETTING_FILL_COLOR] = self.fill_color
         settings[SETTING_RECENT_FILES] = self.recent_files
-        settings[SETTING_ADVANCE_MODE] = not self._beginner
+        # settings[SETTING_ADVANCE_MODE] = not self._beginner
         if self.default_save_dir and os.path.exists(self.default_save_dir):
             settings[SETTING_SAVE_DIR] = self.default_save_dir
         else:
@@ -1747,36 +1757,36 @@ class MainWindow(QMainWindow, WindowMixin):
         )
         self.statusBar().show()
 
-    def open_annotation_dialog(self, _value=False):
-        if self.file_path is None:
-            self.statusBar().showMessage("Please select image first")
-            self.statusBar().show()
-            return
+    # def open_annotation_dialog(self, _value=False):
+    #     if self.file_path is None:
+    #         self.statusBar().showMessage("Please select image first")
+    #         self.statusBar().show()
+    #         return
 
-        path = os.path.dirname(self.file_path) if self.file_path else "."
-        if self.label_file_format == LabelFileFormat.PASCAL_VOC:
-            filters = "Open Annotation XML file (%s)" % " ".join(["*.xml"])
-            filename = QFileDialog.getOpenFileName(
-                self, "%s - Choose a xml file" % __appname__, path, filters
-            )
+    #     path = os.path.dirname(self.file_path) if self.file_path else "."
+    #     if self.label_file_format == LabelFileFormat.PASCAL_VOC:
+    #         filters = "Open Annotation XML file (%s)" % " ".join(["*.xml"])
+    #         filename = QFileDialog.getOpenFileName(
+    #             self, "%s - Choose a xml file" % __appname__, path, filters
+    #         )
 
-            if filename:
-                if isinstance(filename, (tuple, list)):
-                    filename = filename[0]
-            self.load_pascal_xml_by_filename(filename)
+    #         if filename:
+    #             if isinstance(filename, (tuple, list)):
+    #                 filename = filename[0]
+    #         self.load_pascal_xml_by_filename(filename)
 
-        elif self.label_file_format == LabelFileFormat.CREATE_ML:
+    #     elif self.label_file_format == LabelFileFormat.CREATE_ML:
 
-            filters = "Open Annotation JSON file (%s)" % " ".join(["*.json"])
-            filename = QFileDialog.getOpenFileName(
-                self, "%s - Choose a json file" % __appname__, path, filters
-            )
+    #         filters = "Open Annotation JSON file (%s)" % " ".join(["*.json"])
+    #         filename = QFileDialog.getOpenFileName(
+    #             self, "%s - Choose a json file" % __appname__, path, filters
+    #         )
 
-            if filename:
-                if isinstance(filename, (tuple, list)):
-                    filename = filename[0]
+    #         if filename:
+    #             if isinstance(filename, (tuple, list)):
+    #                 filename = filename[0]
 
-            self.load_create_ml_json_by_filename(filename, self.file_path)
+    #         self.load_create_ml_json_by_filename(filename, self.file_path)
 
     def open_dir_dialog(self, _value=False, dir_path=None, silent=False):
         if not self.may_continue():
@@ -1909,26 +1919,26 @@ class MainWindow(QMainWindow, WindowMixin):
         if filename:
             self.load_file(filename)
 
-    def open_file(self, _value=False):
-        if not self.may_continue():
-            return
-        path = os.path.dirname(self.file_path) if self.file_path else "."
-        formats = [
-            "*.%s" % fmt.data().decode("ascii").lower()
-            for fmt in QImageReader.supportedImageFormats()
-        ]
-        filters = "Image & Label files (%s)" % " ".join(
-            formats + ["*%s" % LabelFile.suffix]
-        )
-        filename, _ = QFileDialog.getOpenFileName(
-            self, "%s - Choose Image or Label file" % __appname__, path, filters
-        )
-        if filename:
-            if isinstance(filename, (tuple, list)):
-                filename = filename[0]
-            self.cur_img_idx = 0
-            self.img_count = 1
-            self.load_file(filename)
+    # def open_file(self, _value=False):
+    #     if not self.may_continue():
+    #         return
+    #     path = os.path.dirname(self.file_path) if self.file_path else "."
+    #     formats = [
+    #         "*.%s" % fmt.data().decode("ascii").lower()
+    #         for fmt in QImageReader.supportedImageFormats()
+    #     ]
+    #     filters = "Image & Label files (%s)" % " ".join(
+    #         formats + ["*%s" % LabelFile.suffix]
+    #     )
+    #     filename, _ = QFileDialog.getOpenFileName(
+    #         self, "%s - Choose Image or Label file" % __appname__, path, filters
+    #     )
+    #     if filename:
+    #         if isinstance(filename, (tuple, list)):
+    #             filename = filename[0]
+    #         self.cur_img_idx = 0
+    #         self.img_count = 1
+    #         self.load_file(filename)
 
     def save_file(self, _value=False):
         if self.default_save_dir is not None and len(self.default_save_dir):
@@ -1985,7 +1995,7 @@ class MainWindow(QMainWindow, WindowMixin):
         self.set_clean()
         self.toggle_actions(False)
         self.canvas.setEnabled(False)
-        self.actions.saveAs.setEnabled(False)
+        # self.actions.saveAs.setEnabled(False)
 
     def delete_image(self):
         delete_path = self.file_path

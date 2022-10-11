@@ -3,15 +3,15 @@ from dataclasses import dataclass
 
 @dataclass(frozen=True)
 class StringBundle:
-    openFile: str = "Open"
-    openFileDetail: str = "Open image or label file"
+    # openFile: str = "Open"
+    # openFileDetail: str = "Open image or label file"
     quit: str = "Quit"
     quitApp: str = "Quit application"
     openDir: str = "Open Dir"
     copyPrevBounding: str = "Copy previous Bounding Boxes in the current image"
     changeSavedAnnotationDir: str = "Change default saved Annotation dir"
-    openAnnotation: str = "Open Annotation"
-    openAnnotationDetail: str = "Open an annotation file"
+    # openAnnotation: str = "Open Annotation"
+    # openAnnotationDetail: str = "Open an annotation file"
     changeSaveDir: str = "Change Save Dir"
     nextImg: str = "Next Image"
     nextImgDetail: str = "Open the next Image"
@@ -21,9 +21,9 @@ class StringBundle:
     verifyImgDetail: str = "Verify Image"
     save: str = "Save"
     saveDetail: str = "Save the labels to a file"
-    changeSaveFormat: str = "Change save format"
-    saveAs: str = "Save As"
-    saveAsDetail: str = "Save the labels to a different file"
+    # changeSaveFormat: str = "Change save format"
+    # saveAs: str = "Save As"
+    # saveAsDetail: str = "Save the labels to a different file"
     closeCur: str = "Close"
     closeCurDetail: str = "Close the current file"
     deleteImg: str = "Delete current image"
@@ -73,8 +73,8 @@ class StringBundle:
     displayLabel: str = "Display Labels"
     fileList: str = "File List"
     files: str = "Files"
-    advancedMode: str = "Advanced Mode"
-    advancedModeDetail: str = "Swtich to advanced mode"
+    # advancedMode: str = "Advanced Mode"
+    # advancedModeDetail: str = "Swtich to advanced mode"
     showAllBoxDetail: str = "Show all bounding boxes"
     hideAllBoxDetail: str = "Hide all bounding boxes"
     menu_file: str = "&File"
@@ -84,7 +84,7 @@ class StringBundle:
     menu_openRecent: str = "Open &Recent"
     chooseLineColor: str = "Choose Line Color"
     chooseFillColor: str = "Choose Fill Color"
-    drawSquares: str = "Draw Squares"
+    # drawSquares: str = "Draw Squares"
 
     def get_str(self, string_id: str):
         # print(self.__dict__)
