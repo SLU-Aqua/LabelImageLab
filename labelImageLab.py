@@ -1815,7 +1815,8 @@ class MainWindow(QMainWindow, WindowMixin):
                 self,
                 "%s - Open Directory" % __appname__,
                 default_open_dir_path,
-                QFileDialog.ShowDirsOnly | QFileDialog.DontResolveSymlinks,
+                #QFileDialog.ShowDirsOnly | QFileDialog.DontResolveSymlinks,
+                QFileDialog.DontUseNativeDialog,
             )
 
         else:
