@@ -248,12 +248,21 @@ class MainWindow(QMainWindow, WindowMixin):
         #     self.string_bundle.get_str("openFileDetail"),
         # )
 
+        # parent,
+        # text,
+        # slot=None,
+        # shortcut=None,
+        # icon=None,
+        # tip=None,
+        # checkable=False,
+        # enabled=True,
+
         open_dir = action(
-            self.string_bundle.get_str("openDir"),
-            self.open_dir_dialog,
-            "Ctrl+u",
-            "open",
-            self.string_bundle.get_str("openDir"),
+            self.string_bundle.get_str("openDir"),  # text
+            self.open_dir_dialog,  # slot
+            shortcut="Ctrl+u",
+            icon="open",
+            tip=self.string_bundle.get_str("openDir"),
         )
 
         change_save_dir = action(
@@ -301,6 +310,8 @@ class MainWindow(QMainWindow, WindowMixin):
             "space",
             "verify",
             self.string_bundle.get_str("verifyImgDetail"),
+            # checkable=True,
+            # enabled=False,
         )
 
         warning = action(
@@ -309,6 +320,16 @@ class MainWindow(QMainWindow, WindowMixin):
             "b",
             "warning",
             self.string_bundle.get_str("waningImgDetail"),
+            # checkable=True,
+            # enabled=False,
+        )
+
+        verify_and_open_next_image = action(
+            self.string_bundle.get_str("verifyAndNextImg"),
+            self.verify_and_open_next_image,
+            "v",
+            "verify and next image",
+            self.string_bundle.get_str("verifyAndNextImgDetail"),
         )
 
         save = action(
@@ -773,6 +794,7 @@ class MainWindow(QMainWindow, WindowMixin):
             open_prev_image,
             verify,
             warning,
+            verify_and_open_next_image,
             save,
             # save_format,
             None,
@@ -1815,7 +1837,7 @@ class MainWindow(QMainWindow, WindowMixin):
                 self,
                 "%s - Open Directory" % __appname__,
                 default_open_dir_path,
-                #QFileDialog.ShowDirsOnly | QFileDialog.DontResolveSymlinks,
+                # QFileDialog.ShowDirsOnly | QFileDialog.DontResolveSymlinks,
                 QFileDialog.DontUseNativeDialog,
             )
 
@@ -1892,6 +1914,10 @@ class MainWindow(QMainWindow, WindowMixin):
             self.canvas.warning = self.label_file.warning
             self.paint_canvas()
             self.save_file()
+
+    def verify_and_open_next_image(self, _value=False):
+        self.verify_image()
+        self.open_next_image()
 
     def open_prev_image(self, _value=False):
         # Proceeding prev image without dialog if having any label

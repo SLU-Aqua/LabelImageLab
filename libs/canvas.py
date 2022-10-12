@@ -596,15 +596,74 @@ class Canvas(QWidget):
                 int(self.prev_point.y()),
             )
 
+        # print(self.scale)
+        # print(self.pixmap.width(), self.pixmap.height())
+        # print(self.pixmap.width() * self.scale, self.pixmap.height() * self.scale)
+
+        ws = p.window()
+        fs = int(18 * ws.width() / 1000 / Shape.scale)
+        p.setFont(QFont("Helvetica", fs, QFont.Bold))
+        # print(Shape.scale, p.window(), ws.x(), ws.y(), ws.width(), ws.height())
+        xv = int(5 / Shape.scale)
+        yv = int(5 / Shape.scale + fs)
+        xw = xv  # + int(self.pixmap.width() * 0.5)
+        # xw = int(self.pixmap.width() - 100 / Shape.scale)
+        # xw = int(self.pixmap.width() - 150 / self.scale)
+        # xw = int(200 / Shape.scale)
+        yw = self.pixmap.height() - int(5 / Shape.scale)
+
         self.setAutoFillBackground(True)
         if self.verified and not self.warning:
             pal = self.palette()
             pal.setColor(self.backgroundRole(), QColor(184, 239, 38, 128))
             self.setPalette(pal)
-        elif self.warning:
+
+            p.setPen(QColor(0, 255, 0))
+            p.drawText(
+                QPoint(
+                    xv,
+                    yv,
+                ),
+                "Verified",
+            )
+
+        elif not self.verified and self.warning:
             pal = self.palette()
             pal.setColor(self.backgroundRole(), QColor(250, 50, 50, 128))
             self.setPalette(pal)
+
+            p.setPen(QColor(255, 0, 0))
+            p.drawText(
+                QPoint(
+                    xw,
+                    yw,
+                ),
+                "Warning",
+            )
+
+        elif self.verified and self.warning:
+            pal = self.palette()
+            pal.setColor(self.backgroundRole(), QColor(50, 230, 240, 128))
+            self.setPalette(pal)
+
+            p.setPen(QColor(0, 255, 0))
+            p.drawText(
+                QPoint(
+                    xv,
+                    yv,
+                ),
+                "Verified",
+            )
+
+            p.setPen(QColor(255, 0, 0))
+            p.drawText(
+                QPoint(
+                    xw,
+                    yw,
+                ),
+                "Warning",
+            )
+
         else:
             pal = self.palette()
             pal.setColor(self.backgroundRole(), QColor(232, 232, 232, 255))

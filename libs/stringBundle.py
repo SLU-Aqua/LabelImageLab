@@ -21,6 +21,8 @@ class StringBundle:
     verifyImgDetail: str = "Verify Image"
     warningImg: str = "Warning Image"
     waningImgDetail: str = "Add warning to Image"
+    verifyAndNextImg: str = "Verify and next Image"
+    verifyAndNextImgDetail: str = "Verify the image and open the next Image"
     save: str = "Save"
     saveDetail: str = "Save the labels to a file"
     # changeSaveFormat: str = "Change save format"
