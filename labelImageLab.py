@@ -409,7 +409,8 @@ class MainWindow(QMainWindow, WindowMixin):
         delete = action(
             self.string_bundle.get_str("delBox"),
             self.delete_selected_shape,
-            "Delete",
+            # "Delete",
+            "Backspace",
             "delete",
             self.string_bundle.get_str("delBoxDetail"),
             enabled=False,
