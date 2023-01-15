@@ -1,213 +1,132 @@
-import xml.etree.ElementTree as ET
-from xml.dom import minidom
-import os
+# import copy
+# import os
 from pathlib import Path
 import sys
-
-XML_EXT = ".xml"
+import yaml
 
 
 class BspWriter:
     def __init__(
         self,
-        folder_name,
         filename,
         img_size,
-        database_src="Unknown",
-        local_img_path=None,
     ):
-        self.folder_name = folder_name
-        self.filename = filename
-        self.database_src = database_src
-        self.img_size = img_size
         self.box_list = []
-        self.local_img_path = local_img_path
-        self.verified = False
-        self.warning = False
+        self.annotation = {
+            "image": filename,
+            "state": {"verified": False, "warnings": 0},
+            "size": {
+                "depth": img_size[2],
+                "height": img_size[0],
+                "width": img_size[1],
+            },
+        }
 
-    def prettify(self, elem):
-        # """
-        # Return a pretty-printed XML string for the Element.
-        # """
+    def set_validated(self, validated: bool):
+        self.annotation["state"]["verified"] = validated
 
-        """Return a pretty-printed XML string for the Element."""
-        rough_string = ET.tostring(elem, encoding="unicode", method="xml")
-        reparsed = minidom.parseString(rough_string)
-        prettyxml = reparsed.toprettyxml(indent="  ")
-        # TODO: Fix to remove empty lines introduced by xml.dom.minidom.toprettyxml. This is awful.
-        prettyxml = os.linesep.join([s for s in prettyxml.splitlines() if s.strip()])
-        return prettyxml
+    def set_warnings(self, warnings: int):
+        self.annotation["state"]["warnings"] = warnings
 
-    def gen_xml(self):
-        """
-        Return XML root
-        """
-        # Check conditions
-        if self.filename is None or self.img_size is None:
-            return None
-
-        # top = Element("annotation")
-        root = ET.Element("annotation")
-
-        if self.verified:
-            root.set("verified", "yes")
-        if self.warning:
-            root.set("warning", "yes")
-
-        # filename
-        filename = ET.Element("filename")
-        filename.text = self.filename
-        root.append(filename)
-
-        ## source
-        # source = ET.Element("source")
-        # root.append(source)
-        # filename = ET.SubElement(source, "filename")
-        # filename.text = "TBD"  # source_path.name
-        # path = ET.SubElement(source, "path")
-        # path.text = "TBD"  # str(source_path.parent)
-
-        # size
-        size = ET.Element("size")
-        root.append(size)
-        width = ET.SubElement(size, "width")
-        width.text = str(str(self.img_size[1]))
-        height = ET.SubElement(size, "height")
-        height.text = str(str(self.img_size[0]))
-        depth = ET.SubElement(size, "depth")
-        if len(self.img_size) == 3:
-            depth.text = str(self.img_size[2])
-        else:
-            depth.text = "1"
-
-        for i, each_object in enumerate(self.box_list):
-            object_item = ET.SubElement(root, "object")
-            object_item.set("id", str(i))
-            name = ET.SubElement(object_item, "name")
-            name.text = each_object["name"]
-
-            bnd_box = ET.SubElement(object_item, "bndbox")
-            x_min = ET.SubElement(bnd_box, "xmin")
-            x_min.text = str(each_object["xmin"])
-            y_min = ET.SubElement(bnd_box, "ymin")
-            y_min.text = str(each_object["ymin"])
-            x_max = ET.SubElement(bnd_box, "xmax")
-            x_max.text = str(each_object["xmax"])
-            y_max = ET.SubElement(bnd_box, "ymax")
-            y_max.text = str(each_object["ymax"])
-
-        return root
-
-    # def add_bnd_box(self, x_min, y_min, x_max, y_max, name, difficult):
     def add_bnd_box(self, x_min, y_min, x_max, y_max, name):
         bnd_box = {"xmin": x_min, "ymin": y_min, "xmax": x_max, "ymax": y_max}
         bnd_box["name"] = name
-        # bnd_box["difficult"] = difficult
         self.box_list.append(bnd_box)
 
-    def set_objects(self, target_file_path: Path):
+    def save(self, file_path: Path):
+
+        if file_path.exists():
+            try:
+                verified = self.annotation["state"]["verified"]
+                warnings = self.annotation["state"]["warnings"]
+                file = open(file_path, "r")
+                self.annotation = yaml.load(file, Loader=yaml.FullLoader)
+
+                self.set_validated(verified)
+                self.set_warnings(warnings)
+
+            except OSError as e:
+                sys.exit(f"OSError: {e}")
+            except yaml.YAMLError as e:
+                sys.exit(f"YAMLError: {e}")
+
+        self.annotation["objects"] = []
+
+        # Set object.
+        for i, each_object in enumerate(self.box_list):
+            self.annotation["objects"].append(
+                {
+                    "name": each_object["name"],
+                    "bndbox": {
+                        "xmax": each_object["xmax"] - 1,
+                        "xmin": each_object["xmin"] - 1,
+                        "ymax": each_object["ymax"] - 1,
+                        "ymin": each_object["ymin"] - 1,
+                    },
+                }
+            )
+
+        if len(self.annotation["objects"]) == 0:
+            self.annotation.pop("objects")
 
         try:
-            xml_tree = ET.parse(target_file_path).getroot()
-
-            if self.verified:
-                xml_tree.set("verified", "yes")
-            elif "verified" in xml_tree.attrib.keys():
-                xml_tree.attrib.pop("verified")
-
-            if self.warning:
-                xml_tree.set("warning", "yes")
-            elif "warning" in xml_tree.attrib.keys():
-                xml_tree.attrib.pop("warning")
-
-            # Remove object.
-            for i, object in enumerate(xml_tree.findall("./object")):
-                xml_tree.remove(object)
-
-            # Set object.
-            for i, each_object in enumerate(self.box_list):
-                object_item = ET.SubElement(xml_tree, "object")
-                object_item.set("id", str(i))
-                name = ET.SubElement(object_item, "name")
-                name.text = each_object["name"]
-
-                bnd_box = ET.SubElement(object_item, "bndbox")
-                x_min = ET.SubElement(bnd_box, "xmin")
-                x_min.text = str(each_object["xmin"])
-                y_min = ET.SubElement(bnd_box, "ymin")
-                y_min.text = str(each_object["ymin"])
-                x_max = ET.SubElement(bnd_box, "xmax")
-                x_max.text = str(each_object["xmax"])
-                y_max = ET.SubElement(bnd_box, "ymax")
-                y_max.text = str(each_object["ymax"])
-
-        except ET.ParseError as e:
-            sys.exit(f"ET.ParseError: {e}")
-        except AttributeError as e:
-            sys.exit(f"ET.AttributeError: {e}")
-
-        return xml_tree
-
-    def save(self, target_file=None):
-
-        target_file_path = Path(target_file)
-        if target_file_path.exists():
-            root = self.set_objects(target_file_path)
-        else:
-            root = self.gen_xml()
-        xmlstr = self.prettify(root)
-
-        if target_file is None:
-            assert 0
-            # out_file = codecs.open(self.filename + XML_EXT, "w", encoding=ENCODE_METHOD)
-        else:
-            # out_file = codecs.open(target_file, "w", encoding=ENCODE_METHOD)
-            with open(target_file, "w") as f:
-                f.write(xmlstr)
+            file = open(file_path, "w")
+            yaml.dump(self.annotation, file, allow_unicode=True)
+        except OSError as e:
+            sys.exit(f"OSError: {e}")
+        except yaml.YAMLError as e:
+            sys.exit(f"YAMLError: {e}")
 
 
 class BspReader:
     def __init__(self, file_path):
         self.shapes = []
         self.file_path = file_path
-        self.verified = False
-        self.warning = False
         try:
-            self.parse_xml()
-        except:
-            pass
+            file = open(file_path, "r")
+            self.annotation = yaml.load(file, Loader=yaml.FullLoader)
+
+            if "verified" not in self.annotation["state"]:
+                self.annotation["state"]["verified"] = False
+            if "warnings" not in self.annotation["state"]:
+                self.annotation["state"]["warnings"] = False
+
+            if "objects" in self.annotation:
+                objects = self.annotation["objects"]
+                for obj in objects:
+                    name = str(obj["name"])
+                    x_max = obj["bndbox"]["xmax"] + 1
+                    x_min = obj["bndbox"]["xmin"] + 1
+                    y_max = obj["bndbox"]["ymax"] + 1
+                    y_min = obj["bndbox"]["ymin"] + 1
+                    points = [
+                        (x_min, y_min),
+                        (x_max, y_min),
+                        (x_max, y_max),
+                        (x_min, y_max),
+                    ]
+                    self.shapes.append((name, points, None, None))
+
+        except OSError as e:
+            sys.exit(f"OSError: {e}")
+        except yaml.YAMLError as e:
+            sys.exit(f"YAMLError: {e}")
+        except KeyError as e:
+            sys.exit(f"KeyError: {e}, parsing dict {str(self.file_path)}")
+
+    def validated(self):
+        try:
+            verified = self.annotation["state"]["verified"]
+        except KeyError as e:
+            sys.exit(f"KeyError: {e}, parsing dict {str(self.file_path)}")
+        return verified
+
+    def warnings(self):
+        try:
+            warnings = self.annotation["state"]["warnings"]
+        except KeyError as e:
+            sys.exit(f"KeyError: {e}, parsing dict {str(self.file_path)}")
+        return warnings
 
     def get_shapes(self):
         return self.shapes
-
-    def add_shape(self, label, bnd_box):
-        x_min = int(float(bnd_box.find("xmin").text))
-        y_min = int(float(bnd_box.find("ymin").text))
-        x_max = int(float(bnd_box.find("xmax").text))
-        y_max = int(float(bnd_box.find("ymax").text))
-        points = [(x_min, y_min), (x_max, y_min), (x_max, y_max), (x_min, y_max)]
-        self.shapes.append((label, points, None, None))
-
-    def parse_xml(self):
-
-        xml_tree = ET.parse(self.file_path).getroot()
-
-        try:
-            verified = xml_tree.attrib["verified"]
-            if verified == "yes":
-                self.verified = True
-        except KeyError:
-            self.verified = False
-
-        try:
-            warning = xml_tree.attrib["warning"]
-            if warning == "yes":
-                self.warning = True
-        except KeyError:
-            self.warning = False
-
-        for object_iter in xml_tree.findall("object"):
-            bnd_box = object_iter.find("bndbox")
-            label = object_iter.find("name").text
-            self.add_shape(label, bnd_box)
-        return True

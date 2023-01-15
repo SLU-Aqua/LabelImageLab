@@ -30,7 +30,8 @@ from libs.colorDialog import ColorDialog
 from libs.labelFile import LabelFile, LabelFileError, LabelFileFormat
 from libs.toolBar import ToolBar
 from libs.bsp_io import BspReader
-from libs.bsp_io import XML_EXT
+
+# from libs.bsp_io import XML_EXT
 
 # from libs.pascal_voc_io import PascalVocReader
 # from libs.pascal_voc_io import XML_EXT
@@ -179,7 +180,12 @@ class MainWindow(QMainWindow, WindowMixin):
         self.file_list_widget.itemDoubleClicked.connect(self.file_item_double_clicked)
 
         # Create and add combobox for showing ...
-        items_combo_box_2 = ["all", "verified", "not verified"]
+        items_combo_box_2 = [
+            "all",
+            "verified",
+            "not verified",
+            "no warnings",
+        ]
         # self.combo_box_2 = ComboBox(self, items_combo_box_2)
         self.combo_box_2 = ComboBox(items_combo_box_2)
         self.combo_box_2.cb.currentIndexChanged.connect(self.combo_2_selection_changed)
@@ -1308,8 +1314,10 @@ class MainWindow(QMainWindow, WindowMixin):
         try:
 
             if self.label_file_format == LabelFileFormat.BSP:
-                if annotation_file_path[-4:].lower() != ".xml":
-                    annotation_file_path += XML_EXT
+                # if annotation_file_path[-4:].lower() != ".xml":
+                #    annotation_file_path += XML_EXT
+                if annotation_file_path[-5:].lower() != ".yaml":
+                    annotation_file_path += ".yaml"
                 self.label_file.save_bsp_format(
                     annotation_file_path,
                     shapes,
@@ -1630,14 +1638,15 @@ class MainWindow(QMainWindow, WindowMixin):
         # print("show_bounding_box_from_annotation_file")
         if self.default_save_dir is not None:
             basename = os.path.basename(os.path.splitext(file_path)[0])
-            xml_path = os.path.join(self.default_save_dir, basename + XML_EXT)
+            # xml_path = os.path.join(self.default_save_dir, basename + XML_EXT)
+            yaml_path = os.path.join(self.default_save_dir, basename + ".yaml")
 
             """Annotation file priority:
             PascalXML > YOLO
             """
-            if os.path.isfile(xml_path):
+            if os.path.isfile(yaml_path):
                 if self.label_file_format == LabelFileFormat.BSP:
-                    self.load_bsp_xml_by_filename(xml_path)
+                    self.load_bsp_xml_by_filename(yaml_path)
                 # else:
                 #     self.load_pascal_xml_by_filename(xml_path)
             # elif os.path.isfile(txt_path):
@@ -1646,11 +1655,12 @@ class MainWindow(QMainWindow, WindowMixin):
             #     self.load_create_ml_json_by_filename(json_path, file_path)
 
         else:
-            xml_path = os.path.splitext(file_path)[0] + XML_EXT
+            # xml_path = os.path.splitext(file_path)[0] + XML_EXT
+            yaml_path = os.path.splitext(file_path)[0] + ".yaml"
             # txt_path = os.path.splitext(file_path)[0] + TXT_EXT
-            if os.path.isfile(xml_path):
+            if os.path.isfile(yaml_path):
                 if self.label_file_format == LabelFileFormat.BSP:
-                    self.load_bsp_xml_by_filename(xml_path)
+                    self.load_bsp_xml_by_filename(yaml_path)
             #     else:
             #         self.load_pascal_xml_by_filename(xml_path)
             # elif os.path.isfile(txt_path):
@@ -1750,13 +1760,15 @@ class MainWindow(QMainWindow, WindowMixin):
                     if select > 0:
                         image_path = Path(path)
                         annotaion_path = image_path.parent.joinpath(
-                            image_path.stem + ".xml"
+                            image_path.stem + ".yaml"
                         )
                         t_bsp_parse_reader = BspReader(annotaion_path)
                         # print(t_bsp_parse_reader.verified, annotaion_path.exists())
-                        if select == 1 and t_bsp_parse_reader.verified:
+                        if select == 1 and t_bsp_parse_reader.validated():
                             images.append(path)
-                        elif select == 2 and not t_bsp_parse_reader.verified:
+                        elif select == 2 and not t_bsp_parse_reader.validated():
+                            images.append(path)
+                        elif select == 3 and not t_bsp_parse_reader.warnings():
                             images.append(path)
                     else:
                         images.append(path)
@@ -2172,20 +2184,20 @@ class MainWindow(QMainWindow, WindowMixin):
     #     self.load_labels(shapes)
     #     self.canvas.verified = t_voc_parse_reader.verified
 
-    def load_bsp_xml_by_filename(self, xml_path):
+    def load_bsp_xml_by_filename(self, yaml_path):
         if self.file_path is None:
             return
-        if os.path.isfile(xml_path) is False:
+        if os.path.isfile(yaml_path) is False:
             return
 
         # self.set_format(FORMAT_PASCALVOC)
 
-        t_bsp_parse_reader = BspReader(xml_path)
+        t_bsp_parse_reader = BspReader(yaml_path)
         shapes = t_bsp_parse_reader.get_shapes()
         # print("load_bsp_xml_by_filename")
         self.load_labels(shapes)
-        self.canvas.verified = t_bsp_parse_reader.verified
-        self.canvas.warning = t_bsp_parse_reader.warning
+        self.canvas.verified = t_bsp_parse_reader.validated()
+        self.canvas.warning = t_bsp_parse_reader.warnings()
 
     # def load_yolo_txt_by_filename(self, txt_path):
     #     if self.file_path is None:

@@ -1,10 +1,9 @@
 from PyQt5.QtGui import QImage
-
 from libs.bsp_io import BspWriter
-from libs.bsp_io import XML_EXT
-
 from enum import Enum
 import os.path
+
+from pathlib import Path
 
 
 class LabelFileFormat(Enum):
@@ -21,7 +20,8 @@ class LabelFileError(Exception):
 class LabelFile(object):
     # It might be changed as window creates. By default, using XML ext
     # suffix = '.lif'
-    suffix = XML_EXT
+    # suffix = XML_EXT
+    suffix = ".yaml"
 
     def __init__(self, filename=None):
         self.shapes = ()
@@ -111,6 +111,7 @@ class LabelFile(object):
         img_folder_path = os.path.dirname(image_path)
         img_folder_name = os.path.split(img_folder_path)[-1]
         img_file_name = os.path.basename(image_path)
+
         # imgFileNameWithoutExt = os.path.splitext(img_file_name)[0]
         # Read from file path because self.imageData might be empty if saving to
         # Pascal format
@@ -120,11 +121,14 @@ class LabelFile(object):
             image = QImage()
             image.load(image_path)
         image_shape = [image.height(), image.width(), 1 if image.isGrayscale() else 3]
-        writer = BspWriter(
-            img_folder_name, img_file_name, image_shape, local_img_path=image_path
-        )
-        writer.verified = self.verified
-        writer.warning = self.warning
+        # writer = BspWriter(
+        #     img_folder_name, img_file_name, image_shape, local_img_path=image_path
+        # )
+        writer = BspWriter(filename=img_file_name, img_size=image_shape)
+        # writer.verified = self.verified
+        # writer.warning = self.warning
+        writer.set_validated(self.verified)
+        writer.set_warnings(self.warning)
 
         for shape in shapes:
             points = shape["points"]
@@ -143,7 +147,7 @@ class LabelFile(object):
                 label,
             )
 
-        writer.save(target_file=filename)
+        writer.save(file_path=Path(filename))
         return
 
     # def save_yolo_format(
