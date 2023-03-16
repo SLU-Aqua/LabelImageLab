@@ -1,28 +1,33 @@
 #!/bin/bash
 
-#!/bin/bash
+set -e
 
-set -e 
+BIN=bin
+PYTHON=python
+PIP=pip
+
+case "$OSTYPE" in
+  darwin*)
+    echo "OSX"
+    PYTHON=python3
+    PIP=pip3
+    ;; 
+  linux*)
+    echo "LINUX"
+    ;;
+  msys*)
+    echo "WINDOWS"
+    BIN=Scripts
+    ;;
+  *)
+    echo "unknown: $OSTYPE"
+    ;;
+esac
 
 rm -rf venv
-python.exe -m venv venv
-./venv/Scripts/python.exe -m pip install --upgrade pip 
-./venv/Scripts/pip.exe install --no-cache-dir -r requirements.txt
-
-#case "$OSTYPE" in
-#  solaris*) echo "SOLARIS" ;;
-#  darwin*)  echo "OSX" ;; 
-#  linux*)   echo "LINUX" ;;
-#  bsd*)     echo "BSD" ;;
-#  msys*)    echo "WINDOWS" ;;
-#  cygwin*)  echo "ALSO WINDOWS" ;;
-#  *)        echo "unknown: $OSTYPE" ;;
-#esac
-
-
-#rm -rf venv/
-#python3 -m venv venv
-#venv/bin/pip3 install --upgrade pip
-#venv/bin/pip3 install -r requirements.txt 
+$PYTHON -m venv venv
+venv/$BIN/$PYTHON -m pip install --upgrade pip 
+#venv/$BIN/$PIP install --no-cache-dir -r requirements.txt
+venv/$BIN/$PIP install -r requirements.txt
 
 
