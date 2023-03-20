@@ -25,13 +25,18 @@ venv/bin/pyrcc5 -o libs/resources.py resources.qrc
 ````
 
 ## Usage
-For example 
+For example in Linux
 ````bash
-venv/bin/python3 labelImageLab.py -d /home/erik/tmp/rings3 -c data/bsp_ring_classes.txt
+venv/bin/python labelImageLab.py -c path_to_your_classes_file.txt
 ````
+or in Windows
+````bash
+venv/Scripts/python labelImageLab.py -c path_to_your_classes_file.txt
+````
+
 For help and more options
 ````bash
-venv/bin/python3 labelImageLab.py -h
+venv/bin/python labelImageLab.py -h
 ````
 
 
