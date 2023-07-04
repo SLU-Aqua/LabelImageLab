@@ -1277,7 +1277,8 @@ class MainWindow(QMainWindow, WindowMixin):
                 shape.fill_color = generate_color_by_text(label)
 
             self.add_label(shape)
-        self.update_combo_box()
+        self.update_combo_box()        
+        #self.combo_selection_changed(len(self.combo_box.items)-1) #all
         self.canvas.load_shapes(s)
 
     def update_combo_box(self):
@@ -1288,9 +1289,11 @@ class MainWindow(QMainWindow, WindowMixin):
 
         unique_text_list = list(set(items_text_list))
         # Add a null row for showing all the labels
-        unique_text_list.append("all")
         unique_text_list.sort()
-
+        #unique_text_list.append("all")
+        #print(unique_text_list)
+        unique_text_list.insert(0, "all")    
+        #print(unique_text_list)
         self.combo_box.update_items(unique_text_list)
 
     def save_labels(self, annotation_file_path):
@@ -1581,7 +1584,6 @@ class MainWindow(QMainWindow, WindowMixin):
                 self.canvas.verified = self.label_file.verified
                 self.canvas.warning = self.label_file.warning
             else:
-                # print("koko")
                 # Load image:
                 # read data first and store for saving into label file.
                 self.image_data = read(unicode_file_path, None)
